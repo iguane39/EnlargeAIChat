@@ -1,0 +1,53 @@
+/* Styles globaux - SEULEMENT élargir, NE PAS masquer */
+main {
+  max-width: 75vw !important;
+  width: 75vw !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* ChatGPT - Élargir seulement les grands conteneurs */
+main > div,
+main > div > div,
+main div.flex.flex-col,
+main div[class*="relative"],
+main article {
+  max-width: 100% !important;
+}
+
+/* Claude - Élargir seulement le contenu principal */
+main [class*="ConversationPane"],
+main div.mx-auto,
+main [class*="max-w-"] {
+  max-width: 75vw !important;
+}
+
+/* Gemini - Supprimer l'espace de 72px à gauche causé par la sidebar */
+bard-sidenav-content {
+  position: static !important;
+  inset-inline: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* Gemini - Élargir le conteneur principal chat-window */
+chat-window {
+  max-width: 75vw !important;
+  width: 75vw !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Gemini - S'assurer que les conteneurs enfants prennent 100% */
+chat-window-content,
+.content-wrapper,
+.chat-history,
+.zero-state-container {
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+/* Assurer que les conteneurs parents ne limitent pas */
+body {
+  overflow-x: hidden;
+}
