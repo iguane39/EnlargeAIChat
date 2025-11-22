@@ -24,10 +24,7 @@ function applyForChatGPT() {
   // Élargir main
   const main = document.querySelector('main');
   if (main) {
-    main.style.setProperty('max-width', '75vw', 'important');
-    main.style.setProperty('width', '75vw', 'important');
-    main.style.setProperty('margin-left', 'auto', 'important');
-    main.style.setProperty('margin-right', 'auto', 'important');
+    applyStyles(main);
   }
 
   // Élargir SEULEMENT les grands conteneurs (pas les boutons/dropdowns)
@@ -50,53 +47,128 @@ function applyForChatGPT() {
 }
 
 function applyForClaude() {
-  // Claude utilise aussi Tailwind avec max-w-*
-  const selectors = [
+  // Claude utilise Tailwind avec des classes comme max-w-3xl, max-w-[52rem], etc.
+  // On doit cibler ces éléments et forcer une largeur plus grande.
+
+  // 1. Cibler le conteneur principal de la conversation
+  const mainSelectors = [
     'main',
-    'main [class*="ConversationPane"]',
-    'main [class*="max-w-"]',
-    'main div.mx-auto'
+    '.flex-1.overflow-hidden', // Souvent le conteneur scrollable
+    '.h-full.w-full'
   ];
 
-  selectors.forEach(selector => {
-    document.querySelectorAll(selector).forEach(el => {
-      el.style.setProperty('max-width', '75vw', 'important');
+  mainSelectors.forEach(selector => {
+    const els = document.querySelectorAll(selector);
+    els.forEach(el => {
+      // On ne touche pas aux petits conteneurs
+      if (el.offsetWidth > 500) {
+        el.style.setProperty('max-width', '100%', 'important');
+        el.style.setProperty('width', '100%', 'important');
+      }
     });
+  });
+
+  // 2. Cibler spécifiquement les éléments qui ont une contrainte de largeur (max-w-*)
+  // On utilise un sélecteur d'attribut pour attraper toutes les classes Tailwind
+  const constrainedElements = document.querySelectorAll('[class*="max-w-"]');
+
+  constrainedElements.forEach(el => {
+    // On vérifie si c'est un élément de contenu (pas un bouton ou une icône)
+    // On ignore les éléments trop petits ou qui semblent être des UI controls
+    if (el.offsetWidth > 400 || el.tagName === 'DIV' || el.tagName === 'SECTION') {
+      // On remplace la contrainte par notre largeur
+      el.style.setProperty('max-width', '90vw', 'important'); // 90vw pour être cohérent avec Gemini
+      // el.style.setProperty('width', '100%', 'important'); // Pas forcément width 100% car ça peut casser le layout flex
+    }
+  });
+
+  // 3. Cibler spécifiquement la zone de message (souvent mx-auto)
+  const messageAreas = document.querySelectorAll('.mx-auto');
+  messageAreas.forEach(el => {
+    if (el.offsetWidth > 400) {
+      el.style.setProperty('max-width', '90vw', 'important');
+    }
   });
 }
 
 function applyForGemini() {
-  // Supprimer l'espace de 72px à gauche causé par la sidebar
-  const bardSidenavContent = document.querySelector('bard-sidenav-content');
-  if (bardSidenavContent) {
-    bardSidenavContent.style.setProperty('position', 'static', 'important');
-    bardSidenavContent.style.setProperty('inset-inline', '0', 'important');
-    bardSidenavContent.style.setProperty('width', '100%', 'important');
-    bardSidenavContent.style.setProperty('max-width', '100%', 'important');
-  }
+  // Stratégie "Nucléaire v10" : Largeur Maximale (95%) et Centrée
 
-  // Cibler chat-window - le conteneur principal et le centrer à 75vw
-  const chatWindow = document.querySelector('chat-window');
-  if (chatWindow) {
-    chatWindow.style.setProperty('max-width', '75vw', 'important');
-    chatWindow.style.setProperty('width', '75vw', 'important');
-    chatWindow.style.setProperty('margin-left', 'auto', 'important');
-    chatWindow.style.setProperty('margin-right', 'auto', 'important');
-  }
-
-  // S'assurer que tous les conteneurs enfants prennent 100% de la largeur
-  const selectors = [
-    'chat-window-content',
-    '.content-wrapper',
-    '.chat-history',
-    '.zero-state-container'
+  // 1. Le conteneur principal (bard-sidenav-content)
+  const mainContainers = [
+    'bard-sidenav-content',
+    'main'
   ];
 
-  selectors.forEach(selector => {
-    document.querySelectorAll(selector).forEach(el => {
-      el.style.setProperty('max-width', '100%', 'important');
+  mainContainers.forEach(selector => {
+    const elements = document.querySelectorAll(selector);
+    elements.forEach(el => {
       el.style.setProperty('width', '100%', 'important');
+      el.style.setProperty('max-width', '100%', 'important');
+
+      const style = window.getComputedStyle(el);
+      if (style.display === 'flex') {
+        el.style.setProperty('justify-content', 'center', 'important');
+        el.style.setProperty('align-items', 'stretch', 'important');
+      }
+
+      el.style.setProperty('margin-left', '0', 'important');
+      el.style.setProperty('margin-right', '0', 'important');
+      el.style.setProperty('padding-left', '0', 'important');
     });
+  });
+
+  // 2. Zone de chat interne
+  // On passe à 95% pour remplir l'écran comme demandé
+  const chatAreas = document.querySelectorAll('chat-window, .conversation-container, .content-container, .input-area');
+  chatAreas.forEach(el => {
+    el.style.setProperty('max-width', '95%', 'important');
+    el.style.setProperty('width', '95%', 'important');
+    el.style.setProperty('margin-left', 'auto', 'important');
+    el.style.setProperty('margin-right', 'auto', 'important');
+  });
+
+  // 3. Input Container (Zone de saisie)
+  const inputs = document.querySelectorAll('input-container');
+  inputs.forEach(el => {
+    const style = window.getComputedStyle(el);
+    if (style.position === 'fixed' || style.position === 'absolute') {
+      // On définit la zone disponible (à droite de la sidebar)
+      el.style.setProperty('left', '300px', 'important');
+      el.style.setProperty('right', '0', 'important');
+
+      // On prend 95% de cet espace
+      el.style.setProperty('width', 'calc((100% - 300px) * 0.95)', 'important');
+
+      el.style.setProperty('margin-left', 'auto', 'important');
+      el.style.setProperty('margin-right', 'auto', 'important');
+    } else {
+      el.style.setProperty('max-width', '95%', 'important');
+      el.style.setProperty('width', '95%', 'important');
+      el.style.setProperty('margin-left', 'auto', 'important');
+      el.style.setProperty('margin-right', 'auto', 'important');
+    }
+  });
+
+  // 4. Nettoyage des éléments profonds
+  const root = document.querySelector('main') || document.body;
+  const allElements = root.querySelectorAll('div, section, article');
+
+  allElements.forEach(el => {
+    const style = window.getComputedStyle(el);
+    const maxWidth = style.maxWidth;
+
+    if (maxWidth && maxWidth.includes('px')) {
+      const val = parseInt(maxWidth);
+      if (val > 600 && val < 1200) {
+        el.style.setProperty('max-width', '100%', 'important');
+        el.style.setProperty('width', '100%', 'important');
+      }
+    }
+
+    if (parseInt(style.marginLeft) > 50) {
+      el.style.setProperty('margin-left', '0', 'important');
+    }
   });
 }
 
