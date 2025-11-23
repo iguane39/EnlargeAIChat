@@ -175,46 +175,26 @@ function applyForGemini() {
 }
 
 function applyForPerplexity() {
-  // Perplexity utilise Tailwind CSS avec max-w-screen-md comme conteneur principal
+  // Perplexity utilise Tailwind CSS avec une sidebar et un conteneur @container/main
 
-  // 1. Cibler le conteneur principal avec max-w-screen-md
-  const mainContainer = document.querySelector('.max-w-screen-md');
-  if (mainContainer) {
-    mainContainer.style.setProperty('max-width', '75vw', 'important');
-    mainContainer.style.setProperty('width', '75vw', 'important');
-    mainContainer.style.setProperty('margin-left', 'auto', 'important');
-    mainContainer.style.setProperty('margin-right', 'auto', 'important');
-  }
-
-  // 2. Cibler tous les éléments avec max-w-screen-*
-  const screenConstraints = document.querySelectorAll('[class*="max-w-screen"]');
-  screenConstraints.forEach(el => {
-    el.style.setProperty('max-width', '75vw', 'important');
-    el.style.setProperty('width', '75vw', 'important');
-  });
-
-  // 3. S'assurer que le conteneur @container/main soit élargi
+  // 1. Cibler UNIQUEMENT le max-w-screen-md qui est dans le @container/main
   const containerMain = document.querySelector('.\\@container\\/main');
   if (containerMain) {
-    containerMain.style.setProperty('max-width', '100%', 'important');
-    containerMain.style.setProperty('width', '100%', 'important');
+    const mainContainer = containerMain.querySelector('.max-w-screen-md');
+    if (mainContainer) {
+      mainContainer.style.setProperty('max-width', '75vw', 'important');
+      mainContainer.style.setProperty('width', '75vw', 'important');
+      mainContainer.style.setProperty('margin-left', 'auto', 'important');
+      mainContainer.style.setProperty('margin-right', 'auto', 'important');
+    }
   }
 
-  // 4. Élargir les conteneurs de chat et de contenu
-  const contentSelectors = [
-    '.scrollable-container',
-    '.mx-auto.size-full',
-    '.flex.flex-col.h-full'
-  ];
-
-  contentSelectors.forEach(selector => {
-    document.querySelectorAll(selector).forEach(el => {
-      if (el.offsetWidth > 400) {
-        el.style.setProperty('max-width', '100%', 'important');
-        el.style.setProperty('width', '100%', 'important');
-      }
-    });
-  });
+  // 2. Élargir les conteneurs de contenu scrollable dans le contexte du chat
+  const scrollableContainer = document.querySelector('.scrollable-container .max-w-screen-md');
+  if (scrollableContainer) {
+    scrollableContainer.style.setProperty('max-width', '75vw', 'important');
+    scrollableContainer.style.setProperty('width', '75vw', 'important');
+  }
 }
 
 // Observer pour détecter les changements DOM
