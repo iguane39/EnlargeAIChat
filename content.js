@@ -177,30 +177,18 @@ function applyForGemini() {
 function applyForPerplexity() {
   // Perplexity utilise Tailwind CSS avec une sidebar et un conteneur @container/main
 
-  // 1. Cibler UNIQUEMENT le max-w-screen-md qui est dans le @container/main
-  const containerMain = document.querySelector('.\\@container\\/main');
-  if (containerMain) {
-    const mainContainer = containerMain.querySelector('.max-w-screen-md');
-    if (mainContainer) {
-      mainContainer.style.setProperty('max-width', '75vw', 'important');
-      mainContainer.style.setProperty('width', '75vw', 'important');
-      mainContainer.style.setProperty('margin-left', 'auto', 'important');
-      mainContainer.style.setProperty('margin-right', 'auto', 'important');
-      // Supprimer le padding horizontal qui crée les bandes
-      mainContainer.style.setProperty('padding-left', '0', 'important');
-      mainContainer.style.setProperty('padding-right', '0', 'important');
-    }
-  }
+  // Cibler TOUS les .max-w-screen-md qui sont dans @container/main OU scrollable-container
+  const mainContainers = document.querySelectorAll('.\\@container\\/main .max-w-screen-md, .scrollable-container .max-w-screen-md');
 
-  // 2. Élargir les conteneurs de contenu scrollable dans le contexte du chat
-  const scrollableContainer = document.querySelector('.scrollable-container .max-w-screen-md');
-  if (scrollableContainer) {
-    scrollableContainer.style.setProperty('max-width', '75vw', 'important');
-    scrollableContainer.style.setProperty('width', '75vw', 'important');
-    // Supprimer le padding horizontal
-    scrollableContainer.style.setProperty('padding-left', '0', 'important');
-    scrollableContainer.style.setProperty('padding-right', '0', 'important');
-  }
+  mainContainers.forEach(container => {
+    container.style.setProperty('max-width', '75vw', 'important');
+    container.style.setProperty('width', '75vw', 'important');
+    container.style.setProperty('margin-left', 'auto', 'important');
+    container.style.setProperty('margin-right', 'auto', 'important');
+    // Supprimer le padding horizontal qui crée les bandes
+    container.style.setProperty('padding-left', '0', 'important');
+    container.style.setProperty('padding-right', '0', 'important');
+  });
 }
 
 // Observer pour détecter les changements DOM
