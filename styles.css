@@ -1,63 +1,45 @@
-/* Styles globaux - SEULEMENT élargir, NE PAS masquer */
-main {
-  max-width: 75vw !important;
-  width: 75vw !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
+/* Global CSS Overrides for Enlarge AI Chat */
+
+/* Mistral AI Specific Fixes */
+/* Target specific Tailwind utility classes used by Mistral */
+[class*="max-w-"] {
+  max-width: 95% !important;
 }
 
-/* ChatGPT - Élargir seulement les grands conteneurs */
-main > div,
-main > div > div,
-main div.flex.flex-col,
-main div[class*="relative"],
-main article {
-  max-width: 100% !important;
+/* Target the specific arbitrary value class seen in Le Chat.html */
+/* Note: Escaping special characters for CSS selectors */
+.\!max-w-\(--breakpoint-md\),
+.max-w-\(--breakpoint-md\) {
+  max-width: 95% !important;
+  width: 95% !important;
 }
 
-/* Claude - Élargir seulement le contenu principal */
-main [class*="ConversationPane"],
-main div.mx-auto,
-main [class*="max-w-"] {
-  max-width: 75vw !important;
+/* Target the main container if it has specific classes */
+main div[class*="max-w-"] {
+  max-width: 95% !important;
+  width: 95% !important;
 }
 
-/* Gemini - Supprimer l'espace de 72px à gauche causé par la sidebar */
-bard-sidenav-content {
-  position: static !important;
-  inset-inline: 0 !important;
-  width: 100% !important;
-  max-width: 100% !important;
-}
-
-/* Gemini - Élargir le conteneur principal chat-window */
-chat-window {
-  max-width: 75vw !important;
-  width: 75vw !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-}
-
-/* Gemini - S'assurer que les conteneurs enfants prennent 100% */
-chat-window-content,
-.content-wrapper,
-.chat-history,
-.zero-state-container {
-  max-width: 100% !important;
+/* Generic wide container enforcement */
+.w-full {
   width: 100% !important;
 }
 
-/* Perplexity - Cibler les conteneurs avec max-w-screen-md et padding */
-[class*="max-w-screen-md"][class*="px-"] {
-  max-width: 75vw !important;
-  width: 75vw !important;
+/* Ensure centering is maintained but width is forced */
+.mx-auto {
   margin-left: auto !important;
   margin-right: auto !important;
-  padding-left: 0 !important;
-  padding-right: 0 !important;
 }
 
-/* Assurer que les conteneurs parents ne limitent pas */
-body {
-  overflow-x: hidden;
+/* Input area specific targeting */
+textarea {
+  max-width: 100% !important;
+}
+
+/* Fix for absolute positioned elements that are centered */
+div[style*="left"][style*="right"] {
+    left: 2.5% !important;
+    right: 2.5% !important;
+    width: 95% !important;
+    max-width: 95% !important;
 }
