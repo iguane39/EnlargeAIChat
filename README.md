@@ -1,5 +1,7 @@
 # Enlarge AI Chat - Extension Chrome
 
+[🇬🇧 English Version](README_EN.md)
+
 Extension Chrome qui élargit la fenêtre de chat de ChatGPT, Claude, Gemini, Perplexity et Mistral à 95% de la largeur de l'écran pour une meilleure expérience de lecture.
 
 ## Fonctionnalités
