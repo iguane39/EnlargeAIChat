@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Enlarge AI Chat",
   "version": "2.0.0",
-  "description": "Élargit la fenêtre de chat de ChatGPT, Claude et Gemini à 75% de la largeur de l'écran",
+  "description": "Élargit la fenêtre de chat de ChatGPT, Claude, Gemini et Perplexity à 75% de la largeur de l'écran",
   "permissions": [],
   "content_scripts": [
     {
@@ -10,7 +10,8 @@
         "https://chat.openai.com/*",
         "https://chatgpt.com/*",
         "https://claude.ai/*",
-        "https://gemini.google.com/*"
+        "https://gemini.google.com/*",
+        "https://www.perplexity.ai/*"
       ],
       "css": ["styles.css"],
       "js": ["content.js"],

@@ -47,6 +47,26 @@ chat-window-content,
   width: 100% !important;
 }
 
+/* Perplexity - Élargir le conteneur principal */
+.max-w-screen-md {
+  max-width: 75vw !important;
+  width: 75vw !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Perplexity - Élargir tous les conteneurs avec contrainte de largeur */
+[class*="max-w-screen"] {
+  max-width: 75vw !important;
+  width: 75vw !important;
+}
+
+/* Perplexity - S'assurer que le conteneur @container/main soit élargi */
+.\@container\/main {
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
 /* Assurer que les conteneurs parents ne limitent pas */
 body {
   overflow-x: hidden;
