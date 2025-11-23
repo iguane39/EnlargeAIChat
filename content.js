@@ -213,60 +213,20 @@ function applyForPerplexity() {
     main.style.setProperty('max-width', '100%', 'important');
     main.style.setProperty('width', '100%', 'important');
     main.style.setProperty('padding-left', '0', 'important');
-    main.style.setProperty('padding-right', '0', 'important');
-  }
-}
-
-function applyForMistral() {
-  // Mistral utilise probablement aussi des classes utilitaires (Tailwind ou similaire)
-  // On applique une stratégie similaire à Perplexity/Claude : 95% width
-
-  // 1. Cibler le main
-  const main = document.querySelector('main');
-  if (main) {
-    main.style.setProperty('max-width', '100%', 'important');
-    main.style.setProperty('width', '100%', 'important');
-  }
-
-  // 2. Cibler les conteneurs contraints (max-w-*)
-  const constrainedElements = document.querySelectorAll('[class*="max-w-"]');
-  constrainedElements.forEach(el => {
-    if (el.offsetWidth > 500) {
-      // On force la largeur
-      el.style.setProperty('max-width', '95%', 'important');
-      el.style.setProperty('width', '95%', 'important');
-      el.style.setProperty('margin-left', 'auto', 'important');
-      el.style.setProperty('margin-right', 'auto', 'important');
-    }
   });
 
-  // 3. Cibler les conteneurs centrés (mx-auto)
-  const centeredElements = document.querySelectorAll('.mx-auto');
-  centeredElements.forEach(el => {
-    if (el.offsetWidth > 500) {
-      el.style.setProperty('max-width', '95%', 'important');
-      el.style.setProperty('width', '95%', 'important');
-    }
+  // Appliquer au chargement initial
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', applyWidening);
+  } else {
+    applyWidening();
+  }
+
+  // Observer les changements dans le DOM
+  observer.observe(document.body || document.documentElement, {
+    childList: true,
+    subtree: true
   });
-}
 
-// Observer pour détecter les changements DOM
-const observer = new MutationObserver((mutations) => {
-  applyWidening();
-});
-
-// Appliquer au chargement initial
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', applyWidening);
-} else {
-  applyWidening();
-}
-
-// Observer les changements dans le DOM
-observer.observe(document.body || document.documentElement, {
-  childList: true,
-  subtree: true
-});
-
-// Réappliquer périodiquement (au cas où les styles sont écrasés)
-setInterval(applyWidening, 1000);
+  // Réappliquer périodiquement (au cas où les styles sont écrasés)
+  setInterval(applyWidening, 1000);
