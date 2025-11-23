@@ -177,14 +177,14 @@ function applyForGemini() {
 function applyForPerplexity() {
   // Perplexity utilise Tailwind CSS - nous devons modifier directement les classes
 
-  // Cibler TOUS les éléments avec max-w-screen-md
+  // Cibler TOUS les éléments avec max-w-screen-md (classe commune sur Perplexity pour limiter la largeur)
   const allElements = document.querySelectorAll('[class*="max-w-screen-md"]');
 
   allElements.forEach(el => {
     // Récupérer toutes les classes actuelles
     let classes = el.className.split(' ');
 
-    // Filtrer pour supprimer max-w-screen-md, px-md, px-lg, md:px-lg
+    // Filtrer pour supprimer max-w-screen-md, px-md, px-lg, md:px-lg qui contraignent la largeur/padding
     classes = classes.filter(c =>
       !c.includes('max-w-screen') &&
       !c.startsWith('px-') &&
