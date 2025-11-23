@@ -177,17 +177,20 @@ function applyForGemini() {
 function applyForPerplexity() {
   // Perplexity utilise Tailwind CSS avec une sidebar et un conteneur @container/main
 
-  // Cibler TOUS les .max-w-screen-md qui sont dans @container/main OU scrollable-container
-  const mainContainers = document.querySelectorAll('.\\@container\\/main .max-w-screen-md, .scrollable-container .max-w-screen-md');
+  // Approche agressive: Cibler TOUS les éléments avec px-md ou px-lg qui contiennent aussi max-w-screen-md
+  const allElements = document.querySelectorAll('[class*="max-w-screen-md"]');
 
-  mainContainers.forEach(container => {
-    container.style.setProperty('max-width', '75vw', 'important');
-    container.style.setProperty('width', '75vw', 'important');
-    container.style.setProperty('margin-left', 'auto', 'important');
-    container.style.setProperty('margin-right', 'auto', 'important');
-    // Supprimer le padding horizontal qui crée les bandes
-    container.style.setProperty('padding-left', '0', 'important');
-    container.style.setProperty('padding-right', '0', 'important');
+  allElements.forEach(el => {
+    const classes = el.className;
+    // Vérifier si l'élément a des classes de padding horizontal
+    if (classes.includes('px-md') || classes.includes('px-lg')) {
+      el.style.setProperty('max-width', '75vw', 'important');
+      el.style.setProperty('width', '75vw', 'important');
+      el.style.setProperty('margin-left', 'auto', 'important');
+      el.style.setProperty('margin-right', 'auto', 'important');
+      el.style.setProperty('padding-left', '0', 'important');
+      el.style.setProperty('padding-right', '0', 'important');
+    }
   });
 }
 

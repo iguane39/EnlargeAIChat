@@ -47,8 +47,8 @@ chat-window-content,
   width: 100% !important;
 }
 
-/* Perplexity - Cibler uniquement le conteneur de contenu principal */
-.\@container\/main .max-w-screen-md {
+/* Perplexity - Cibler les conteneurs avec max-w-screen-md et padding */
+[class*="max-w-screen-md"][class*="px-"] {
   max-width: 75vw !important;
   width: 75vw !important;
   margin-left: auto !important;
