@@ -213,20 +213,69 @@ function applyForPerplexity() {
     main.style.setProperty('max-width', '100%', 'important');
     main.style.setProperty('width', '100%', 'important');
     main.style.setProperty('padding-left', '0', 'important');
-  });
+    main.style.setProperty('padding-right', '0', 'important');
+  }
+}
 
-  // Appliquer au chargement initial
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', applyWidening);
-  } else {
-    applyWidening();
+function applyForMistral() {
+  console.log("Enlarge AI Chat: Applying for Mistral");
+
+  // 1. Cibler le main
+  const main = document.querySelector('main');
+  if (main) {
+    main.style.setProperty('max-width', '100%', 'important');
+    main.style.setProperty('width', '100%', 'important');
   }
 
-  // Observer les changements dans le DOM
-  observer.observe(document.body || document.documentElement, {
-    childList: true,
-    subtree: true
+  // 2. Cibler spécifiquement le conteneur "Nouveau Chat" / Input
+  // La classe est souvent max-w-(--breakpoint-md) ou similaire
+  const specificContainers = document.querySelectorAll('[class*="max-w-"]');
+  specificContainers.forEach(el => {
+    // On cible les DIVs qui ont une certaine taille ou qui contiennent l'input
+    if (el.tagName === 'DIV' && (el.offsetWidth > 300 || el.querySelector('input') || el.querySelector('textarea') || el.querySelector('[contenteditable]'))) {
+      el.style.setProperty('max-width', '95%', 'important');
+      el.style.setProperty('width', '95%', 'important');
+      el.style.setProperty('margin-left', 'auto', 'important');
+      el.style.setProperty('margin-right', 'auto', 'important');
+    }
   });
 
-  // Réappliquer périodiquement (au cas où les styles sont écrasés)
-  setInterval(applyWidening, 1000);
+  // 3. Cibler les zones de messages (souvent dans un scroll-area)
+  const messageContainers = document.querySelectorAll('.flex.flex-col.items-center');
+  messageContainers.forEach(el => {
+    if (el.offsetWidth > 300) {
+      el.style.setProperty('max-width', '95%', 'important');
+      el.style.setProperty('width', '95%', 'important');
+    }
+  });
+
+  // 4. Fallback générique pour tout ce qui est centré avec mx-auto
+  const centeredElements = document.querySelectorAll('.mx-auto');
+  centeredElements.forEach(el => {
+    if (el.offsetWidth > 300) {
+      el.style.setProperty('max-width', '95%', 'important');
+      el.style.setProperty('width', '95%', 'important');
+    }
+  });
+}
+
+// Observer pour détecter les changements DOM
+const observer = new MutationObserver((mutations) => {
+  applyWidening();
+});
+
+// Appliquer au chargement initial
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', applyWidening);
+} else {
+  applyWidening();
+}
+
+// Observer les changements dans le DOM
+observer.observe(document.body || document.documentElement, {
+  childList: true,
+  subtree: true
+});
+
+// Réappliquer périodiquement (au cas où les styles sont écrasés)
+setInterval(applyWidening, 1000);
