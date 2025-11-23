@@ -170,14 +170,136 @@ function applyForGemini() {
       }
     }
 
-    applyWidening();
-  }
+    if (parseInt(style.marginLeft) > 50) {
+      el.style.setProperty('margin-left', '0', 'important');
+    }
+  });
+}
 
-  // Observer les changements dans le DOM
-  observer.observe(document.body || document.documentElement, {
-    childList: true,
-    subtree: true
+function applyForPerplexity() {
+  // Perplexity utilise Tailwind CSS
+  // Stratégie : Cibler les conteneurs de largeur contrainte et les forcer à 95%
+
+  // Cibler plus large : max-w-screen-* mais aussi max-w-3xl, 4xl etc.
+  const allElements = document.querySelectorAll('[class*="max-w-"]');
+
+  allElements.forEach(el => {
+    // On ne touche que les éléments qui semblent être des conteneurs principaux
+    if (el.offsetWidth > 500) {
+      // Récupérer toutes les classes actuelles
+      let classes = el.className.split(' ');
+
+      // Filtrer pour supprimer les classes de largeur et de padding latéral
+      classes = classes.filter(c =>
+        !c.includes('max-w-') &&
+        !c.startsWith('px-') &&
+        !c.includes(':px-')
+      );
+
+      // Réappliquer les classes nettoyées
+      el.className = classes.join(' ');
+
+      // Appliquer nos styles : 95% de largeur
+      el.style.setProperty('max-width', '95%', 'important');
+      el.style.setProperty('width', '95%', 'important');
+      el.style.setProperty('margin-left', 'auto', 'important');
+      el.style.setProperty('margin-right', 'auto', 'important');
+    }
   });
 
-  // Réappliquer périodiquement (au cas où les styles sont écrasés)
-  setInterval(applyWidening, 1000);
+  // Cibler spécifiquement la grille ou le layout principal si nécessaire
+  const main = document.querySelector('main');
+  if (main) {
+    main.style.setProperty('max-width', '100%', 'important');
+    main.style.setProperty('width', '100%', 'important');
+    main.style.setProperty('padding-left', '0', 'important');
+    main.style.setProperty('padding-right', '0', 'important');
+  }
+}
+
+function applyForMistral() {
+  // Stratégie "Super Nucléaire" v2.2.4 : Détecteur de Centrage
+  // On cherche tout ce qui est centré visuellement (marges égales et grandes)
+
+  try {
+    const main = document.querySelector('main');
+    if (!main) return;
+
+    // 1. Élargir le main lui-même
+    main.style.setProperty('max-width', '100%', 'important');
+    main.style.setProperty('width', '100%', 'important');
+
+    // 2. Scanner TOUS les éléments dans le main pour trouver ceux qui sont centrés
+    const allElements = main.querySelectorAll('*');
+
+    allElements.forEach(el => {
+      // Optimisation : ignorer les petits éléments
+      if (el.offsetWidth < 300) return;
+      if (el.tagName === 'SVG' || el.tagName === 'PATH') return;
+
+      const style = window.getComputedStyle(el);
+
+      // Détection de centrage par marges automatiques ou égales
+      const marginLeft = parseInt(style.marginLeft) || 0;
+      const marginRight = parseInt(style.marginRight) || 0;
+
+      // Critère : Marges > 50px et à peu près égales (à 10px près)
+      // Cela capture les colonnes centrées "étroites"
+      if (marginLeft > 50 && marginRight > 50 && Math.abs(marginLeft - marginRight) < 20) {
+        el.style.setProperty('max-width', '95%', 'important');
+        el.style.setProperty('width', '95%', 'important');
+        el.style.setProperty('margin-left', 'auto', 'important');
+        el.style.setProperty('margin-right', 'auto', 'important');
+      }
+
+      // Backup : Si max-width est défini explicitement (ex: 48rem)
+      if (style.maxWidth !== 'none' && style.maxWidth !== '100%' && !style.maxWidth.includes('%')) {
+        el.style.setProperty('max-width', '95%', 'important');
+        el.style.setProperty('width', '95%', 'important');
+      }
+    });
+
+    // 3. Ciblage spécifique Input (au cas où il échappe à la règle ci-dessus)
+    const inputs = document.querySelectorAll('textarea, input[type="text"]');
+    inputs.forEach(input => {
+      // Remonter aux parents pour trouver le conteneur contraint
+      let parent = input.parentElement;
+      let count = 0;
+      while (parent && count < 5) {
+        if (parent.offsetWidth > 300) {
+          const pStyle = window.getComputedStyle(parent);
+          if (pStyle.maxWidth !== 'none') {
+            parent.style.setProperty('max-width', '95%', 'important');
+            parent.style.setProperty('width', '95%', 'important');
+          }
+        }
+        parent = parent.parentElement;
+        count++;
+      }
+    });
+
+  } catch (e) {
+    console.error("Enlarge AI Chat: Error in applyForMistral", e);
+  }
+}
+
+// Observer pour détecter les changements DOM
+const observer = new MutationObserver((mutations) => {
+  applyWidening();
+});
+
+// Appliquer au chargement initial
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', applyWidening);
+} else {
+  applyWidening();
+}
+
+// Observer les changements dans le DOM
+observer.observe(document.body || document.documentElement, {
+  childList: true,
+  subtree: true
+});
+
+// Réappliquer périodiquement (au cas où les styles sont écrasés)
+setInterval(applyWidening, 1000);
