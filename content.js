@@ -186,6 +186,9 @@ function applyForPerplexity() {
       mainContainer.style.setProperty('width', '75vw', 'important');
       mainContainer.style.setProperty('margin-left', 'auto', 'important');
       mainContainer.style.setProperty('margin-right', 'auto', 'important');
+      // Supprimer le padding horizontal qui crée les bandes
+      mainContainer.style.setProperty('padding-left', '0', 'important');
+      mainContainer.style.setProperty('padding-right', '0', 'important');
     }
   }
 
@@ -194,6 +197,9 @@ function applyForPerplexity() {
   if (scrollableContainer) {
     scrollableContainer.style.setProperty('max-width', '75vw', 'important');
     scrollableContainer.style.setProperty('width', '75vw', 'important');
+    // Supprimer le padding horizontal
+    scrollableContainer.style.setProperty('padding-left', '0', 'important');
+    scrollableContainer.style.setProperty('padding-right', '0', 'important');
   }
 }
 

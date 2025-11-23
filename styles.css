@@ -53,6 +53,8 @@ chat-window-content,
   width: 75vw !important;
   margin-left: auto !important;
   margin-right: auto !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
 }
 
 /* Assurer que les conteneurs parents ne limitent pas */
