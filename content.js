@@ -175,22 +175,32 @@ function applyForGemini() {
 }
 
 function applyForPerplexity() {
-  // Perplexity utilise Tailwind CSS avec une sidebar et un conteneur @container/main
+  // Perplexity utilise Tailwind CSS - nous devons modifier directement les classes
 
-  // Approche agressive: Cibler TOUS les éléments avec px-md ou px-lg qui contiennent aussi max-w-screen-md
+  // Cibler TOUS les éléments avec max-w-screen-md
   const allElements = document.querySelectorAll('[class*="max-w-screen-md"]');
 
   allElements.forEach(el => {
-    const classes = el.className;
-    // Vérifier si l'élément a des classes de padding horizontal
-    if (classes.includes('px-md') || classes.includes('px-lg')) {
-      el.style.setProperty('max-width', '75vw', 'important');
-      el.style.setProperty('width', '75vw', 'important');
-      el.style.setProperty('margin-left', 'auto', 'important');
-      el.style.setProperty('margin-right', 'auto', 'important');
-      el.style.setProperty('padding-left', '0', 'important');
-      el.style.setProperty('padding-right', '0', 'important');
-    }
+    // Récupérer toutes les classes actuelles
+    let classes = el.className.split(' ');
+
+    // Filtrer pour supprimer max-w-screen-md, px-md, px-lg, md:px-lg
+    classes = classes.filter(c =>
+      !c.includes('max-w-screen') &&
+      !c.startsWith('px-') &&
+      !c.includes(':px-')
+    );
+
+    // Réappliquer les classes sans les classes problématiques
+    el.className = classes.join(' ');
+
+    // Appliquer nos styles
+    el.style.setProperty('max-width', '75vw', 'important');
+    el.style.setProperty('width', '75vw', 'important');
+    el.style.setProperty('margin-left', 'auto', 'important');
+    el.style.setProperty('margin-right', 'auto', 'important');
+    el.style.setProperty('padding-left', '0', 'important');
+    el.style.setProperty('padding-right', '0', 'important');
   });
 }
 
