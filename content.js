@@ -175,33 +175,44 @@ function applyForGemini() {
 }
 
 function applyForPerplexity() {
-  // Perplexity utilise Tailwind CSS - nous devons modifier directement les classes
+  // Perplexity utilise Tailwind CSS
+  // Stratégie : Cibler les conteneurs de largeur contrainte et les forcer à 95%
 
-  // Cibler TOUS les éléments avec max-w-screen-md (classe commune sur Perplexity pour limiter la largeur)
-  const allElements = document.querySelectorAll('[class*="max-w-screen-md"]');
+  // Cibler plus large : max-w-screen-* mais aussi max-w-3xl, 4xl etc.
+  const allElements = document.querySelectorAll('[class*="max-w-"]');
 
   allElements.forEach(el => {
-    // Récupérer toutes les classes actuelles
-    let classes = el.className.split(' ');
+    // On ne touche que les éléments qui semblent être des conteneurs principaux
+    if (el.offsetWidth > 500) {
+      // Récupérer toutes les classes actuelles
+      let classes = el.className.split(' ');
 
-    // Filtrer pour supprimer max-w-screen-md, px-md, px-lg, md:px-lg qui contraignent la largeur/padding
-    classes = classes.filter(c =>
-      !c.includes('max-w-screen') &&
-      !c.startsWith('px-') &&
-      !c.includes(':px-')
-    );
+      // Filtrer pour supprimer les classes de largeur et de padding latéral
+      classes = classes.filter(c =>
+        !c.includes('max-w-') &&
+        !c.startsWith('px-') &&
+        !c.includes(':px-')
+      );
 
-    // Réappliquer les classes sans les classes problématiques
-    el.className = classes.join(' ');
+      // Réappliquer les classes nettoyées
+      el.className = classes.join(' ');
 
-    // Appliquer nos styles
-    el.style.setProperty('max-width', '75vw', 'important');
-    el.style.setProperty('width', '75vw', 'important');
-    el.style.setProperty('margin-left', 'auto', 'important');
-    el.style.setProperty('margin-right', 'auto', 'important');
-    el.style.setProperty('padding-left', '0', 'important');
-    el.style.setProperty('padding-right', '0', 'important');
+      // Appliquer nos styles : 95% de largeur
+      el.style.setProperty('max-width', '95%', 'important');
+      el.style.setProperty('width', '95%', 'important');
+      el.style.setProperty('margin-left', 'auto', 'important');
+      el.style.setProperty('margin-right', 'auto', 'important');
+    }
   });
+
+  // Cibler spécifiquement la grille ou le layout principal si nécessaire
+  const main = document.querySelector('main');
+  if (main) {
+    main.style.setProperty('max-width', '100%', 'important');
+    main.style.setProperty('width', '100%', 'important');
+    main.style.setProperty('padding-left', '0', 'important');
+    main.style.setProperty('padding-right', '0', 'important');
+  }
 }
 
 // Observer pour détecter les changements DOM
