@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Enlarge AI Chat",
-  "version": "2.2.5",
+  "version": "2.3.0",
   "description": "Élargit la fenêtre de chat de ChatGPT, Claude, Gemini et Perplexity à 75% de la largeur de l'écran",
   "permissions": [],
   "content_scripts": [

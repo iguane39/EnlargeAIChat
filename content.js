@@ -218,85 +218,62 @@ function applyForPerplexity() {
 }
 
 function applyForMistral() {
-  // Stratégie "Hyper Nucléaire" v2.2.5
-  // Support Multi-Main + Flexbox Centering + Absolute Positioning
+  // Stratégie "Heuristic Widener" v2.3.0
+  // Approche géométrique : "Narrow Column in Wide Parent"
 
   try {
-    // 1. Cibler TOUS les éléments main (pas juste le premier)
-    const mains = document.querySelectorAll('main');
-    mains.forEach(main => {
-      main.style.setProperty('max-width', '100%', 'important');
-      main.style.setProperty('width', '100%', 'important');
+    const viewportWidth = window.innerWidth;
 
-      // Scanner les enfants directs et profonds
-      const allElements = main.querySelectorAll('*');
+    // 1. Scanner les éléments potentiels
+    // On cible div, section, main, article pour ne pas scanner tout le DOM
+    const candidates = document.querySelectorAll('div, section, main, article');
 
-      allElements.forEach(el => {
-        // Optimisation
-        if (el.offsetWidth < 300) return;
-        if (el.tagName === 'SVG' || el.tagName === 'PATH') return;
+    candidates.forEach(el => {
+      // Optimisation : ignorer les petits éléments et les éléments cachés
+      if (el.offsetWidth < 500 || el.offsetParent === null) return;
 
-        const style = window.getComputedStyle(el);
-        const parentStyle = el.parentElement ? window.getComputedStyle(el.parentElement) : null;
+      const style = window.getComputedStyle(el);
 
-        // CAS 1 : Centrage par Marges (margin: auto)
-        const marginLeft = parseInt(style.marginLeft) || 0;
-        const marginRight = parseInt(style.marginRight) || 0;
-        if (marginLeft > 50 && marginRight > 50 && Math.abs(marginLeft - marginRight) < 20) {
-          el.style.setProperty('max-width', '95%', 'important');
-          el.style.setProperty('width', '95%', 'important');
-          el.style.setProperty('margin-left', 'auto', 'important');
-          el.style.setProperty('margin-right', 'auto', 'important');
+      // Ignorer les éléments fixes/absolus SAUF s'ils contiennent un textarea (barre de saisie)
+      const isPositioned = style.position === 'fixed' || style.position === 'absolute';
+      const hasTextarea = el.querySelector('textarea');
+      if (isPositioned && !hasTextarea) return;
+
+      // CRITÈRE GÉOMÉTRIQUE
+      // 1. L'élément est "étroit" (< 85% du viewport)
+      // 2. Son parent est "large" (> 95% du viewport)
+      // Cela identifie mathématiquement une colonne de contenu contrainte
+
+      const parent = el.parentElement;
+      if (!parent) return;
+
+      const widthRatio = el.offsetWidth / viewportWidth;
+      const parentWidthRatio = parent.offsetWidth / viewportWidth;
+
+      if (widthRatio < 0.85 && parentWidthRatio > 0.95) {
+        // C'est notre cible !
+        el.style.setProperty('max-width', '95%', 'important');
+        el.style.setProperty('width', '95%', 'important');
+        el.style.setProperty('margin-left', 'auto', 'important');
+        el.style.setProperty('margin-right', 'auto', 'important');
+
+        // Si c'est une flexbox, on s'assure qu'elle ne force pas l'alignement
+        if (style.display === 'flex') {
+          el.style.setProperty('justify-content', 'center', 'important');
         }
-
-        // CAS 2 : Centrage Flexbox (parent align-items/justify-content center)
-        // Si l'élément a une max-width définie et est dans un parent flex centré
-        if (parentStyle && parentStyle.display === 'flex') {
-          if (parentStyle.justifyContent === 'center' || parentStyle.alignItems === 'center') {
-            if (style.maxWidth !== 'none' && style.maxWidth !== '100%') {
-              el.style.setProperty('max-width', '95%', 'important');
-              el.style.setProperty('width', '95%', 'important');
-              // On laisse le flex faire le centrage, on force juste la largeur
-            }
-          }
-        }
-
-        // CAS 3 : Classes Tailwind explicites (max-w-*)
-        // On ressuscite ce sélecteur car il est très efficace si présent
-        if (el.className && typeof el.className === 'string' && el.className.includes('max-w-')) {
-          // Vérifier si c'est une contrainte "étroite" (pas max-w-full)
-          if (!el.className.includes('max-w-full') && !el.className.includes('max-w-screen')) {
-            el.style.setProperty('max-width', '95%', 'important');
-            el.style.setProperty('width', '95%', 'important');
-          }
-        }
-
-        // CAS 4 : Position Absolute Centrée
-        if (style.position === 'absolute' || style.position === 'fixed') {
-          if (style.left !== 'auto' && style.right !== 'auto') {
-            // Si ancré des deux côtés avec une marge, on élargit
-            const left = parseInt(style.left);
-            const right = parseInt(style.right);
-            if (left > 100 && right > 100) {
-              el.style.setProperty('left', '2.5%', 'important');
-              el.style.setProperty('right', '2.5%', 'important');
-              el.style.setProperty('width', '95%', 'important');
-              el.style.setProperty('max-width', '95%', 'important');
-            }
-          }
-        }
-      });
+      }
     });
 
-    // 2. Ciblage spécifique Input (Textarea parents)
+    // 2. Filet de sécurité pour l'Input Bar (souvent le plus dur à attraper)
     const textareas = document.querySelectorAll('textarea');
     textareas.forEach(textarea => {
+      // On remonte pour trouver le conteneur qui limite la largeur
       let parent = textarea.parentElement;
       let count = 0;
-      // Remonter jusqu'à trouver le conteneur qui bride la largeur
-      while (parent && count < 6) {
+      while (parent && count < 5) {
         const pStyle = window.getComputedStyle(parent);
-        if (parent.offsetWidth > 300 && pStyle.maxWidth !== 'none') {
+        if (parent.offsetWidth > 300 && parent.offsetWidth < viewportWidth * 0.85) {
+          // Si ce parent limite la largeur, on l'élargit
           parent.style.setProperty('max-width', '95%', 'important');
           parent.style.setProperty('width', '95%', 'important');
         }
