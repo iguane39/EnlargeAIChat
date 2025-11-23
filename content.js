@@ -10,6 +10,8 @@ function applyWidening() {
     applyForGemini();
   } else if (hostname.includes('perplexity.ai')) {
     applyForPerplexity();
+  } else if (hostname.includes('mistral.ai')) {
+    applyForMistral();
   }
 }
 
@@ -213,6 +215,39 @@ function applyForPerplexity() {
     main.style.setProperty('padding-left', '0', 'important');
     main.style.setProperty('padding-right', '0', 'important');
   }
+}
+
+function applyForMistral() {
+  // Mistral utilise probablement aussi des classes utilitaires (Tailwind ou similaire)
+  // On applique une stratégie similaire à Perplexity/Claude : 95% width
+
+  // 1. Cibler le main
+  const main = document.querySelector('main');
+  if (main) {
+    main.style.setProperty('max-width', '100%', 'important');
+    main.style.setProperty('width', '100%', 'important');
+  }
+
+  // 2. Cibler les conteneurs contraints (max-w-*)
+  const constrainedElements = document.querySelectorAll('[class*="max-w-"]');
+  constrainedElements.forEach(el => {
+    if (el.offsetWidth > 500) {
+      // On force la largeur
+      el.style.setProperty('max-width', '95%', 'important');
+      el.style.setProperty('width', '95%', 'important');
+      el.style.setProperty('margin-left', 'auto', 'important');
+      el.style.setProperty('margin-right', 'auto', 'important');
+    }
+  });
+
+  // 3. Cibler les conteneurs centrés (mx-auto)
+  const centeredElements = document.querySelectorAll('.mx-auto');
+  centeredElements.forEach(el => {
+    if (el.offsetWidth > 500) {
+      el.style.setProperty('max-width', '95%', 'important');
+      el.style.setProperty('width', '95%', 'important');
+    }
+  });
 }
 
 // Observer pour détecter les changements DOM
