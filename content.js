@@ -218,60 +218,87 @@ function applyForPerplexity() {
 }
 
 function applyForMistral() {
-  // Stratégie "Super Nucléaire" v2.2.4 : Détecteur de Centrage
-  // On cherche tout ce qui est centré visuellement (marges égales et grandes)
+  // Stratégie "Hyper Nucléaire" v2.2.5
+  // Support Multi-Main + Flexbox Centering + Absolute Positioning
 
   try {
-    const main = document.querySelector('main');
-    if (!main) return;
+    // 1. Cibler TOUS les éléments main (pas juste le premier)
+    const mains = document.querySelectorAll('main');
+    mains.forEach(main => {
+      main.style.setProperty('max-width', '100%', 'important');
+      main.style.setProperty('width', '100%', 'important');
 
-    // 1. Élargir le main lui-même
-    main.style.setProperty('max-width', '100%', 'important');
-    main.style.setProperty('width', '100%', 'important');
+      // Scanner les enfants directs et profonds
+      const allElements = main.querySelectorAll('*');
 
-    // 2. Scanner TOUS les éléments dans le main pour trouver ceux qui sont centrés
-    const allElements = main.querySelectorAll('*');
+      allElements.forEach(el => {
+        // Optimisation
+        if (el.offsetWidth < 300) return;
+        if (el.tagName === 'SVG' || el.tagName === 'PATH') return;
 
-    allElements.forEach(el => {
-      // Optimisation : ignorer les petits éléments
-      if (el.offsetWidth < 300) return;
-      if (el.tagName === 'SVG' || el.tagName === 'PATH') return;
+        const style = window.getComputedStyle(el);
+        const parentStyle = el.parentElement ? window.getComputedStyle(el.parentElement) : null;
 
-      const style = window.getComputedStyle(el);
+        // CAS 1 : Centrage par Marges (margin: auto)
+        const marginLeft = parseInt(style.marginLeft) || 0;
+        const marginRight = parseInt(style.marginRight) || 0;
+        if (marginLeft > 50 && marginRight > 50 && Math.abs(marginLeft - marginRight) < 20) {
+          el.style.setProperty('max-width', '95%', 'important');
+          el.style.setProperty('width', '95%', 'important');
+          el.style.setProperty('margin-left', 'auto', 'important');
+          el.style.setProperty('margin-right', 'auto', 'important');
+        }
 
-      // Détection de centrage par marges automatiques ou égales
-      const marginLeft = parseInt(style.marginLeft) || 0;
-      const marginRight = parseInt(style.marginRight) || 0;
+        // CAS 2 : Centrage Flexbox (parent align-items/justify-content center)
+        // Si l'élément a une max-width définie et est dans un parent flex centré
+        if (parentStyle && parentStyle.display === 'flex') {
+          if (parentStyle.justifyContent === 'center' || parentStyle.alignItems === 'center') {
+            if (style.maxWidth !== 'none' && style.maxWidth !== '100%') {
+              el.style.setProperty('max-width', '95%', 'important');
+              el.style.setProperty('width', '95%', 'important');
+              // On laisse le flex faire le centrage, on force juste la largeur
+            }
+          }
+        }
 
-      // Critère : Marges > 50px et à peu près égales (à 10px près)
-      // Cela capture les colonnes centrées "étroites"
-      if (marginLeft > 50 && marginRight > 50 && Math.abs(marginLeft - marginRight) < 20) {
-        el.style.setProperty('max-width', '95%', 'important');
-        el.style.setProperty('width', '95%', 'important');
-        el.style.setProperty('margin-left', 'auto', 'important');
-        el.style.setProperty('margin-right', 'auto', 'important');
-      }
+        // CAS 3 : Classes Tailwind explicites (max-w-*)
+        // On ressuscite ce sélecteur car il est très efficace si présent
+        if (el.className && typeof el.className === 'string' && el.className.includes('max-w-')) {
+          // Vérifier si c'est une contrainte "étroite" (pas max-w-full)
+          if (!el.className.includes('max-w-full') && !el.className.includes('max-w-screen')) {
+            el.style.setProperty('max-width', '95%', 'important');
+            el.style.setProperty('width', '95%', 'important');
+          }
+        }
 
-      // Backup : Si max-width est défini explicitement (ex: 48rem)
-      if (style.maxWidth !== 'none' && style.maxWidth !== '100%' && !style.maxWidth.includes('%')) {
-        el.style.setProperty('max-width', '95%', 'important');
-        el.style.setProperty('width', '95%', 'important');
-      }
+        // CAS 4 : Position Absolute Centrée
+        if (style.position === 'absolute' || style.position === 'fixed') {
+          if (style.left !== 'auto' && style.right !== 'auto') {
+            // Si ancré des deux côtés avec une marge, on élargit
+            const left = parseInt(style.left);
+            const right = parseInt(style.right);
+            if (left > 100 && right > 100) {
+              el.style.setProperty('left', '2.5%', 'important');
+              el.style.setProperty('right', '2.5%', 'important');
+              el.style.setProperty('width', '95%', 'important');
+              el.style.setProperty('max-width', '95%', 'important');
+            }
+          }
+        }
+      });
     });
 
-    // 3. Ciblage spécifique Input (au cas où il échappe à la règle ci-dessus)
-    const inputs = document.querySelectorAll('textarea, input[type="text"]');
-    inputs.forEach(input => {
-      // Remonter aux parents pour trouver le conteneur contraint
-      let parent = input.parentElement;
+    // 2. Ciblage spécifique Input (Textarea parents)
+    const textareas = document.querySelectorAll('textarea');
+    textareas.forEach(textarea => {
+      let parent = textarea.parentElement;
       let count = 0;
-      while (parent && count < 5) {
-        if (parent.offsetWidth > 300) {
-          const pStyle = window.getComputedStyle(parent);
-          if (pStyle.maxWidth !== 'none') {
-            parent.style.setProperty('max-width', '95%', 'important');
-            parent.style.setProperty('width', '95%', 'important');
-          }
+      // Remonter jusqu'à trouver le conteneur qui bride la largeur
+      while (parent && count < 6) {
+        const pStyle = window.getComputedStyle(parent);
+        if (parent.offsetWidth > 300 && pStyle.maxWidth !== 'none') {
+          parent.style.setProperty('max-width', '95%', 'important');
+          parent.style.setProperty('width', '95%', 'important');
         }
         parent = parent.parentElement;
         count++;
